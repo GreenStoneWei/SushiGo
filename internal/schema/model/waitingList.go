@@ -8,7 +8,7 @@ type WaitingList struct {
 	Id           int
 	UserId       int
 	RestaurantId bool
-	Date         time.Time
+	Date         string
 	Number       int
 	WaitingAt    time.Time `orm:"null"`
 	CheckInAt    time.Time `orm:"null"`
