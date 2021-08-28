@@ -14,7 +14,7 @@ func GetLastWaitingListByRestaurantId(restaurantId int, userId int) (int64, int)
 	dateString := getDateString()
 
 	var waitinglist model.WaitingList
-	err := db.QueryTable("waiting_list").Filter("restaurant_id", restaurantId).Filter("date", dateString).One(&waitinglist)
+	err := db.QueryTable("waiting_list").Filter("restaurant_id", restaurantId).Filter("date", dateString).OrderBy("-Id").One(&waitinglist) // orderBy -col means DESC
 
 	var nextWaitingNumber int
 	var waitingListId int64
@@ -26,6 +26,7 @@ func GetLastWaitingListByRestaurantId(restaurantId int, userId int) (int64, int)
 			RestaurantId: restaurantId,
 			Date:         dateString,
 			Number:       1,
+			WaitingAt:    time.Now(),
 		}
 		id, err := db.Insert(&waitinglist)
 		if err != nil {
@@ -38,6 +39,7 @@ func GetLastWaitingListByRestaurantId(restaurantId int, userId int) (int64, int)
 			RestaurantId: restaurantId,
 			Date:         dateString,
 			Number:       waitinglist.Number + 1,
+			WaitingAt:    time.Now(),
 		}
 		id, err := db.Insert(&waitinglist)
 		if err != nil {

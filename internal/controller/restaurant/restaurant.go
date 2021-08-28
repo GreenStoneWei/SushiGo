@@ -29,15 +29,32 @@ func PostWaitingList(c *gin.Context) {
 	}
 
 	var requestBody WaitingListRequest
-	reqBodyErr := c.BindJSON(&requestBody)
-	if reqBodyErr != nil {
-		panic(reqBodyErr)
+	err = c.BindJSON(&requestBody)
+	if err != nil {
+		panic(err)
 	}
+
 	userId, err := strconv.Atoi(requestBody.UserId)
 
 	waitingListId, number := restaurantModel.GetLastWaitingListByRestaurantId(restaurantId, userId)
 
 	c.IndentedJSON(http.StatusOK, gin.H{"waitingListId": waitingListId, "number": number})
+}
+
+func PatchRestaurantById(c *gin.Context) {
+	restaurantId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+	var requestBody restaurantModel.PatchRestaurantRequest
+	err = c.BindJSON(&requestBody)
+	if err != nil {
+		panic(err)
+	}
+
+	restaurantModel.PatchRestaurantById(restaurantId, requestBody)
+
+	c.IndentedJSON(http.StatusOK, gin.H{"result": "success"})
 }
 
 type WaitingListRequest struct {

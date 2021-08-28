@@ -13,6 +13,8 @@ func main() {
 
 	router.GET("/restaurants", restaurantController.GetAllRestaurants)
 	router.GET("/restaurants/:id", restaurantController.GetRestaurantById)
+	router.PATCH("/restaurants/:id", restaurantController.PatchRestaurantById)
 	router.POST("/restaurants/:id/waitinglist", restaurantController.PostWaitingList)
+	router.PATCH("/waitinglist/:id", restaurantController.PatchWaitingListById)
 	router.Run("localhost:9595")
 }
