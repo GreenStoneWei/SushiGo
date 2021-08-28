@@ -12,6 +12,7 @@ func main() {
 	router := gin.Default()
 
 	router.GET("/restaurants", restaurantController.GetAllRestaurants)
+	router.GET("/restaurants/:id", restaurantController.GetRestaurantById)
 	router.POST("/restaurants/:id/waitinglist", restaurantController.PostWaitingList)
 	router.Run("localhost:9595")
 }

@@ -7,7 +7,7 @@ import (
 type WaitingList struct {
 	Id           int
 	UserId       int
-	RestaurantId bool
+	RestaurantId int
 	Date         string
 	Number       int
 	WaitingAt    time.Time `orm:"null"`

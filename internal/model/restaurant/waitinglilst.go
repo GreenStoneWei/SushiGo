@@ -9,28 +9,46 @@ import (
 	model "stone.com/sushigo/internal/schema/model"
 )
 
-func GetLastWaitingListByRestaurantId(restaurantId string, userId string) (string, string) { // *model.WaitingList
+func GetLastWaitingListByRestaurantId(restaurantId int, userId int) (int64, int) { // *model.WaitingList
 	db := schema.GetDBInstance()
 	dateString := getDateString()
-	fmt.Printf("restaurantId %v", restaurantId)
-	fmt.Printf("userId %v", userId)
+
 	var waitinglist model.WaitingList
 	err := db.QueryTable("waiting_list").Filter("restaurant_id", restaurantId).Filter("date", dateString).One(&waitinglist)
 
-	// var nextWaitingNumber = 0
-	fmt.Printf("Returned waitinglist %p", waitinglist)
-	if err == orm.ErrNoRows {
-		// No result
-		fmt.Printf("Not row found")
-	}
-	// if waitinglist {
+	var nextWaitingNumber int
+	var waitingListId int64
 
-	// }
-	return "1", "2"
+	if err == orm.ErrNoRows {
+		fmt.Println("Not row found")
+		waitinglist := model.WaitingList{
+			UserId:       userId,
+			RestaurantId: restaurantId,
+			Date:         dateString,
+			Number:       1,
+		}
+		id, err := db.Insert(&waitinglist)
+		if err != nil {
+			panic(err)
+		}
+		waitingListId = id
+	} else {
+		waitinglist := model.WaitingList{
+			UserId:       userId,
+			RestaurantId: restaurantId,
+			Date:         dateString,
+			Number:       waitinglist.Number + 1,
+		}
+		id, err := db.Insert(&waitinglist)
+		if err != nil {
+			panic(err)
+		}
+		waitingListId = id
+	}
+	return waitingListId, nextWaitingNumber
 }
 
 func getDateString() string {
 	now := time.Now().Format("2006-01-02")
-	fmt.Printf("Now: %s", now)
 	return now
 }

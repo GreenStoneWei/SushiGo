@@ -1,8 +1,8 @@
 package restaurant
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	restaurantModel "stone.com/sushigo/internal/model/restaurant"
@@ -13,18 +13,33 @@ func GetAllRestaurants(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, result)
 }
 
-func PostWaitingList(c *gin.Context) {
-	restaurantId := c.Param("id")
-	fmt.Println("restaurantId %v", restaurantId)
-	var requestBody struct{ userId string }
-	err := c.BindJSON(&requestBody)
+func GetRestaurantById(c *gin.Context) {
+	restaurantId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		return
+		panic(err)
 	}
-	userId := requestBody.userId
-	fmt.Println("requestBody %v", requestBody)
-	fmt.Println("userId %v", userId)
+	result := restaurantModel.GetRestaurantById(restaurantId)
+	c.IndentedJSON(http.StatusOK, result)
+}
+
+func PostWaitingList(c *gin.Context) {
+	restaurantId, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	var requestBody WaitingListRequest
+	reqBodyErr := c.BindJSON(&requestBody)
+	if reqBodyErr != nil {
+		panic(reqBodyErr)
+	}
+	userId, err := strconv.Atoi(requestBody.UserId)
+
 	waitingListId, number := restaurantModel.GetLastWaitingListByRestaurantId(restaurantId, userId)
 
-	c.IndentedJSON(http.StatusOK, gin.H{waitingListId: waitingListId, number: number})
+	c.IndentedJSON(http.StatusOK, gin.H{"waitingListId": waitingListId, "number": number})
+}
+
+type WaitingListRequest struct {
+	UserId string
 }
